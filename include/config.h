@@ -2,7 +2,7 @@
 
 #define MQ2A_PIN 34
 #define MQ2D_PIN 35
-#define RED_LED 26
+#define RED_LED 2
 #define BUZZER 27
 #define SIM_RX_PIN 16
 #define SIM_TX_PIN 17
@@ -18,7 +18,8 @@ constexpr unsigned long SIM_CALL_RING_MS = 10000UL;
 
 constexpr uint32_t SIM_BAUD_RATE = 9600;
 
-constexpr int GAS_WARNING_THRESHOLD = 700;
+constexpr int GAS_SAFE_THRESHOLD = 650;
+constexpr int GAS_WARNING_THRESHOLD = 800;
 constexpr int GAS_DANGER_THRESHOLD = 1000;
 
 constexpr bool SEND_TEST_SMS_ON_BOOT = true;
