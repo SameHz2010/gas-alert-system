@@ -106,34 +106,58 @@ void pollAlertModule()
 
 int sampleGasSensor()
 {
-  long total = 0;
-  constexpr int sampleCount = 10;
+  constexpr int sampleCount = 15;
+  int samples[sampleCount];
 
+  // Lấy mẫu
   for (int i = 0; i < sampleCount; i++)
   {
-    total += analogRead(MQ2A_PIN);
-    delay(5);
+    samples[i] = analogRead(MQ2A_PIN);
+    delay(3);
   }
 
-  return (int)(total / sampleCount);
+  // Bubble sort nhỏ gọn để lọc nhiễu
+  for (int i = 0; i < sampleCount - 1; i++)
+  {
+    for (int j = i + 1; j < sampleCount; j++)
+    {
+      if (samples[i] > samples[j])
+      {
+        int temp = samples[i];
+        samples[i] = samples[j];
+        samples[j] = temp;
+      }
+    }
+  }
+
+  // Bỏ 2 giá trị nhỏ nhất + 2 lớn nhất
+  long total = 0;
+  for (int i = 2; i < sampleCount - 2; i++)
+  {
+    total += samples[i];
+  }
+
+  return total / (sampleCount - 4);
 }
 
 int detectGasState(float temperature, float humidity, int gas, float deltaGas, float gasRelative)
 {
-  bool harshEnv = (humidity > 85.0f || temperature > 45.0f || temperature < 5.0f);
+  bool harshEnv = (humidity > 90.0f || temperature > 50.0f || temperature < 0.0f);
 
-  if (harshEnv && gas < 900)
+  // Sensor có thể bị ảnh hưởng môi trường mạnh
+  if (harshEnv && gas < GAS_WARNING_THRESHOLD)
     return 4;
 
-  // if (gas > GAS_DANGER_THRESHOLD && deltaGas > 80.0f && gasRelative > 1.20f)
-  //   return 3;
-  if (gas > 800)
+  // Nguy hiểm thật sự
+  if (gas >= GAS_DANGER_THRESHOLD && (deltaGas > 60.0f || gasRelative > 1.15f))
     return 3;
 
-  if (gas > (GAS_WARNING_THRESHOLD + 100) && (deltaGas > 40.0f || gasRelative > 1.10f))
+  // Cảnh báo mạnh
+  if (gas >= GAS_WARNING_THRESHOLD && (deltaGas > 35.0f || gasRelative > 1.02f))
     return 2;
 
-  if (gas > (GAS_WARNING_THRESHOLD - 50) || deltaGas > 25.0f || gasRelative > 1.05f)
+  // Cảnh báo nhẹ
+  if (gas >= GAS_SAFE_THRESHOLD || deltaGas > 20.0f || gasRelative > 1.03f)
     return 1;
 
   return 0;
@@ -141,7 +165,23 @@ int detectGasState(float temperature, float humidity, int gas, float deltaGas, f
 
 void alertControl(int state)
 {
-  digitalWrite(RED_LED, (state == 2 || state == 3 || state == 4) ? HIGH : LOW);
+  static unsigned long lastBlink = 0;
+  static bool ledState = false;
+
+  // blink mỗi 500ms
+  if (millis() - lastBlink >= 500)
+  {
+    lastBlink = millis();
+    ledState = !ledState;
+  }
+
+  // State 2,3,4 thì LED nhấp nháy
+  if (state == 2 || state == 3 || state == 4)
+    digitalWrite(RED_LED, ledState ? HIGH : LOW);
+  else
+    digitalWrite(RED_LED, LOW);
+
+  // Chỉ danger mới bật còi
   digitalWrite(BUZZER, (state == 3) ? HIGH : LOW);
 }
 
