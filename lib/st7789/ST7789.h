@@ -27,6 +27,7 @@ public:
     void drawString(int x, int y, const char *str, uint16_t color, uint16_t bg);
     void drawChar(int x, int y, char c, uint16_t color, uint16_t bg);
     void drawLine(int x0, int y0, int x1, int y1, uint16_t color);
+    void drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
 
     spi_device_handle_t spi;
 

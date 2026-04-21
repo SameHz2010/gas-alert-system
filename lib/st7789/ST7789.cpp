@@ -473,3 +473,11 @@ void ST7789::drawLine(int x0, int y0, int x1, int y1, uint16_t color)
         }
     }
 }
+
+void ST7789::drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
+{
+    drawLine(x, y, x + w - 1, y, color);                 // Cạnh trên
+    drawLine(x, y + h - 1, x + w - 1, y + h - 1, color); // Cạnh dưới
+    drawLine(x, y, x, y + h - 1, color);                 // Cạnh trái
+    drawLine(x + w - 1, y, x + w - 1, y + h - 1, color); // Cạnh phải
+}
