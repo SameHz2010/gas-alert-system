@@ -124,8 +124,7 @@ void uploadData(float temperature,
   if (!Firebase.ready())
     return;
 
-  // format thời gian:
-  // 23:56:28 18/04/2026
+  // Hiển thị thời gian đầy đủ
   char timeString[32];
   strftime(
       timeString,
@@ -133,20 +132,30 @@ void uploadData(float temperature,
       "%H:%M:%S %d/%m/%Y",
       &info);
 
+  // Chỉ lấy ngày-tháng-năm để làm folder
+  char dateString[16];
+  strftime(
+      dateString,
+      sizeof(dateString),
+      "%d-%m-%Y",
+      &info);
+
   long ts = time(NULL);
 
-  char path[80];
+  char path[120];
   snprintf(
       path,
       sizeof(path),
-      "/devices/%s/dataset/%ld",
+      "/devices/%s/%s/%ld",
       DEVICE_ID,
+      dateString,
       ts);
 
   FirebaseJson json;
 
   json.set("device_id", DEVICE_ID);
-  json.set("timestamp", timeString); // chỉ giữ field này
+  json.set("date", dateString);
+  json.set("timestamp", timeString);
 
   json.set("temperature", temperature);
   json.set("humidity", humidity);
@@ -157,7 +166,7 @@ void uploadData(float temperature,
 
   if (Firebase.RTDB.setJSON(&fbdo, path, &json))
   {
-    Serial.printf("Upload OK [%s]\n", DEVICE_ID);
+    Serial.printf("Upload OK [%s_%s]\n", DEVICE_ID, dateString);
     Serial.print("Time: ");
     Serial.println(timeString);
     Serial.println("----------------------------------------------");
