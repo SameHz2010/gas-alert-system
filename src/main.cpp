@@ -132,6 +132,12 @@ void setup()
   pinMode(RED_LED, OUTPUT);
   pinMode(BUZZER, OUTPUT);
 
+  pinMode(15, OUTPUT);
+  digitalWrite(15, HIGH); // bật LED
+  delay(500);
+  digitalWrite(15, LOW); // bật LED
+  delay(2000);
+
   Wire.begin(21, 22);
 
   if (!dht20_init())
@@ -163,6 +169,10 @@ void setup()
 
   for (int i = 0; i < MAX_POINTS; i++)
     gas_history[i] = 0;
+
+  digitalWrite(15, HIGH); // tắt LED
+  delay(500);
+  printf("Setup complete\n");
 }
 
 void loop()

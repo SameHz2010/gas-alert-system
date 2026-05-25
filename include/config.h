@@ -2,7 +2,7 @@
 
 #define MQ2A_PIN 34
 #define MQ2D_PIN 35
-#define RED_LED 2
+#define RED_LED 36
 #define BUZZER 27
 #define SIM_RX_PIN 16
 #define SIM_TX_PIN 17
